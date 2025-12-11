@@ -2,442 +2,280 @@
 import random
 import time
 
-class Player:
-   
-    def __init__(self, name):
-      
-        self.name = name
-        
-        self.hp = 100
-        
-        self.max_hp = 100
-       
-        self.attack_min = 8
-       
-        self.attack_max = 15
-      
-        self.gold = 20
-       
-        self.xp = 0
-        
-        self.level = 1
-        
-        self.healing_potions = 3
-       
-
-    def is_alive(self):
-        
-        return self.hp > 0
-
-    def attack(self):
-       
-        return random.randint(self.attack_min, self.attack_max)
-
-    def heal(self):
-       
-        if self.healing_potions > 0:
-          
-            amount = random.randint(15, 30)
-           
-            self.hp = min(self.max_hp, self.hp + amount)
-           
-            self.healing_potions -= 1
-           
-            print(f"Użyto mikstury. HP +{amount}")
-        else:
-            
-            print("Brak mikstur!")
-
-    def add_xp(self, amount):
-      
-        self.xp += amount
-     
-        print(f"+{amount} XP!")
-        
-        if self.xp >= self.level * 50:
-          
-            self.level_up()
-
-    def level_up(self):
-        
-        self.level += 1
-      
-        self.max_hp += 20
-        
-        self.hp = self.max_hp
-      
-        self.attack_min += 3
-        
-        self.attack_max += 3
-       
-        print(f"*** AWANS NA POZIOM {self.level}! ***")
-
-class Enemy:
-    
-    def __init__(self, name, hp, attack_min, attack_max, gold_reward, xp_reward):
-      
-        self.name = name
-       
-        self.hp = hp
-    
-        self.attack_min = attack_min
-    
-        self.attack_max = attack_max
-      
-        self.gold_reward = gold_reward
-        
-        self.xp_reward = xp_reward
-
-    def is_alive(self):
-  
-        return self.hp > 0
-
-    def attack(self):
-   
-        return random.randint(self.attack_min, self.attack_max)
 
 
-def create_random_enemy(player_level):
-   
-    enemies = [
-        ("Goblin", 40 + player_level * 5, 5, 10, 10, 20),
-       
-        ("Wilk", 35 + player_level * 4, 6, 12, 8, 18),
-    
-        ("Szkielet", 45 + player_level * 6, 7, 14, 15, 25),
-      
-    ]
-   
-    name, hp, amin, amax, gold, xp = random.choice(enemies)
-   
-    return Enemy(name, hp, amin, amax, gold, xp)
+def pauza():
+    time.sleep(1)
 
-def fight(player, enemy):
-    
-    print(f"\n=== WALKA: {enemy.name} ===")
-    
-    while player.is_alive() and enemy.is_alive():
-      
-        print(f"\n{player.name} HP: {player.hp}/{player.max_hp}")
-       
-        print(f"{enemy.name} HP: {enemy.hp}")
-       
-        print("[1] Atak")
-       
-        print("[2] Leczenie")
-     
-        print("[3] Ucieczka")
-       
-        choice = input("> ")
-      
-        if choice == "1":
-          
-            dmg = player.attack()
-            
-            enemy.hp -= dmg
-           
-            print(f"Zadajesz {dmg} obrażeń!")
-        elif choice == "2":
-          
-            player.heal()
-        elif choice == "3":
-           
-            if random.random() < 0.5:
-               
-                print("Uciekłeś!")
-              
-                return
-            else:
-               
-                print("Nie udało się uciec!")
-        else:
-           
-            print("Zły wybór.")
-            continue
-     
-        if enemy.is_alive():
-            
-            dmg = enemy.attack()
-           
-            player.hp -= dmg
-           
-            print(f"{enemy.name} zadaje ci {dmg} obrażeń!")
-          
-            if not player.is_alive():
-                print("Zginąłeś!")
-              
-                return
-    
-    print(f"\nPokonałeś {enemy.name}!")
-   
-    player.gold += enemy.gold_reward
-    
-    print(f"Zdobyt złoto: {enemy.gold_reward}")
-   
-    player.add_xp(enemy.xp_reward)
+def linia():
+    print("-" * 50)
 
-def shop(player):
-  
+def wybor_opcji(ile):
     while True:
-       
-        print("\n=== SKLEP ===")
-      
-        print(f"Twoje złoto: {player.gold}")
-      
-        print("[1] Mikstura leczenia (10 złota)")
-       
-        print("[2] Wzmocnienie ataku (50 złota)")
-       
-        print("[3] Wyjście")
-        
-        choice = input("> ")
-     
-        if choice == "1":
-          
-            if player.gold >= 10:
-            
-                player.gold -= 10
-             
-                player.healing_potions += 1
-             
-                print("Kupiono miksturę.")
-            else:
-               
-                print("Za mało złota.")
-        elif choice == "2":
-         
-            if player.gold >= 50:
-                
-                player.gold -= 50
-              
-                player.attack_min += 2
-               
-                player.attack_max += 2
-            
-                print("Wzmocniono atak.")
-            else:
-             
-                print("Za mało złota.")
-        elif choice == "3":
-         
-            return
-        else:
-        
-            print("Zły wybór.")
+        try:
+            x = int(input("> "))
+            if 1 <= x <= ile:
+                return x
+        except:
+            pass
+        print("Wpisz numer od 1 do", ile)
 
-def main_menu():
-   
-    print("==== RPG ====")
-    
-    name = input("Podaj imię bohatera: ")
-   
-    player = Player(name)
-   
-    while True:
-        
-        print("\n=== MENU ===")
-      
-        print("[1] Walcz")
-      
-        print("[2] Sklep")
-        
-        print("[3] Statystyki")
-        
-        print("[4] Zakończ")
-        
-        choice = input("> ")
-     
-        if choice == "1":
-           
-            enemy = create_random_enemy(player.level)
-           
-            fight(player, enemy)
-           
-            if not player.is_alive():
-               
-                print("Koniec gry!")
-              
-                break
-        elif choice == "2":
-            
-            shop(player)
-        elif choice == "3":
-        
-            print(f"\n{player.name} — Poziom {player.level}")
-           
-            print(f"HP: {player.hp}/{player.max_hp}")
-          
-            print(f"Atak: {player.attack_min}-{player.attack_max}")
-          
-            print(f"XP: {player.xp}")
-         
-            print(f"Złoto: {player.gold}")
-           
-            print(f"Mikstury: {player.healing_potions}")
-        elif choice == "4":
-          
-            print("Do zobaczenia!")
-        
-            break
-        else:
-           
-            print("Zły wybór.")
 
-lore = [
-    
-    "Dawno temu kraina Eldoria upadła pod naporem mroku.",
-  
-    "Tylko nieliczni bohaterowie mieli odwagę stawić mu czoła.",
-   
-    "W ruinach starożytnych miast kryją się sekrety dawnych czasów.",
-   
-    "Bestie wypełzają z lasów, atakując podróżnych.",
-]
+def stworz_postac():
+    linia()
+    print("Witaj w PROSTEJ GRZE RPG!")
+    imie = input("Podaj imię postaci: ")
 
-def show_lore():
-    
-    print("\n=== LORE ===")
-  
-    for line in lore:
-      
-        print(line)
-        
-        time.sleep(0.1)
+    linia()
+    print("Wybierz klasę:")
+    print("1. Wojownik")
+    print("2. Mag")
 
-extra_messages = [
-   
-    "Czujesz dziwną obecność...",
-    
-    "Wiatr niesie szepty starożytnych.",
-   
-    "Twoje przeznaczenie jeszcze się nie wypełniło.",
-]
+    wybor = wybor_opcji(2)
 
-def random_message():
-    
-    if random.random() < 0.2:
-       
-        print(random.choice(extra_messages))
+    postac = {
+        "imie": imie,
+        "poziom": 1,
+        "exp": 0,
+        "zloto": 0
+    }
 
-def exploration_event(player):
-    
-    print("\nWyruszasz na wyprawę...")
-    
-    random_message()
-    
-    event = random.randint(1, 4)
-    
-    if event == 1:
-       
-        print("Znalazłeś skrzynkę! +10 złota")
-       
-        player.gold += 10
-    elif event == 2:
-   
-        print("Napotykasz wroga!")
-      
-        enemy = create_random_enemy(player.level)
-      
-        fight(player, enemy)
-    elif event == 3:
-      
-        print("Odnajdujesz starożytny posąg. +20 XP")
-        
-        player.add_xp(20)
+    if wybor == 1:
+        postac["klasa"] = "Wojownik"
+        postac["max_hp"] = 30
+        postac["hp"] = 30
+        postac["sila"] = 6
+        postac["zrecznosc"] = 4
+        postac["mana"] = 0
+        postac["max_mana"] = 0
+
     else:
-     
-        print("Nic się nie wydarzyło.")
+        postac["klasa"] = "Mag"
+        postac["max_hp"] = 18
+        postac["hp"] = 18
+        postac["sila"] = 3
+        postac["zrecznosc"] = 3
+        postac["mana"] = 20
+        postac["max_mana"] = 20
 
-def extended_menu(player):
-    
+    print(f"Rozpoczynasz przygodę jako {postac['imie']} ({postac['klasa']})!")
+    pauza()
+
+    return postac
+
+
+def pokaz_statystyki(postac):
+    linia()
+    print(f"Statystyki postaci: {postac['imie']}")
+    print("Klasa:", postac["klasa"])
+    print("Poziom:", postac["poziom"])
+    print("HP:", postac["hp"], "/", postac["max_hp"])
+    print("Mana:", postac["mana"], "/", postac["max_mana"])
+    print("Siła:", postac["sila"])
+    print("Zręczność:", postac["zrecznosc"])
+    print("Doświadczenie:", postac["exp"])
+    print("Złoto:", postac["zloto"])
+    linia()
+
+
+
+def dodaj_exp(postac, ile):
+    print(f"+{ile} EXP!")
+    postac["exp"] += ile
+
+    if postac["exp"] >= postac["poziom"] * 20:
+        postac["poziom"] += 1
+        postac["exp"] = 0
+        postac["max_hp"] += 5
+        postac["hp"] = postac["max_hp"]
+        postac["sila"] += 1
+        postac["zrecznosc"] += 1
+        postac["max_mana"] += 2
+        postac["mana"] = postac["max_mana"]
+        print("AWANS NA WYŻSZY POZIOM!")
+        pauza()
+
+
+def atak_postaci(postac):
+    return random.randint(postac["sila"], postac["sila"] + 4)
+
+def unik_postaci(postac):
+    return random.randint(0, postac["zrecznosc"])
+
+
+
+def losowy_przeciwnik():
+    lista = [
+        ("Goblin", 10, 4, 5, 10),
+        ("Wilk", 12, 5, 6, 12),
+        ("Bandzior", 15, 6, 8, 14),
+        ("Szkielet", 14, 5, 10, 15)
+    ]
+
+    w = random.choice(lista)
+
+    przeciwnik = {
+        "nazwa": w[0],
+        "hp": w[1],
+        "max_hp": w[1],
+        "sila": w[2],
+        "zloto": w[3],
+        "exp": w[4]
+    }
+
+    return przeciwnik
+
+def atak_przeciwnika(przeciwnik):
+    return random.randint(przeciwnik["sila"] - 1, przeciwnik["sila"] + 2)
+
+
+
+def walka(postac, przeciwnik):
+    linia()
+    print(f"Napotkałeś przeciwnika: {przeciwnik['nazwa']}")
+    pauza()
+
+    while postac["hp"] > 0 and przeciwnik["hp"] > 0:
+        linia()
+        print(f"{postac['imie']}: {postac['hp']}/{postac['max_hp']} HP")
+        print(f"{przeciwnik['nazwa']}: {przeciwnik['hp']}/{przeciwnik['max_hp']} HP")
+        linia()
+
+        print("1. Atak")
+        print("2. Unik")
+        print("3. Leczenie (tylko Mag)")
+        print("4. Ucieczka")
+
+        wybor = wybor_opcji(4)
+
+        if wybor == 1:
+            dmg = atak_postaci(postac)
+            przeciwnik["hp"] -= dmg
+            print(f"Zadałeś {dmg} obrażeń!")
+
+        elif wybor == 2:
+            if unik_postaci(postac) > random.randint(2,6):
+                print("Uniknięto ataku!")
+                continue
+            else:
+                print("Nie udało się uniknąć!")
+
+        elif wybor == 3:
+            if postac["klasa"] == "Mag" and postac["mana"] >= 5:
+                postac["mana"] -= 5
+                leczenie = random.randint(6,12)
+                postac["hp"] = min(postac["max_hp"], postac["hp"] + leczenie)
+                print("Wyleczono:", leczenie)
+            else:
+                print("Nie możesz się leczyć.")
+                continue
+
+        elif wybor == 4:
+            if random.random() < 0.5:
+                print("Uciekłeś!")
+                return
+            else:
+                print("Nie udało się uciec!")
+
+        if przeciwnik["hp"] > 0:
+            dmg = atak_przeciwnika(przeciwnik)
+            postac["hp"] -= dmg
+            print("Przeciwnik zadał ci", dmg, "obrażeń.")
+
+        pauza()
+
+    if postac["hp"] <= 0:
+        print("Zostałeś pokonany...")
+        exit()
+
+    print(f"Pokonałeś {przeciwnik['nazwa']}!")
+    postac["zloto"] += przeciwnik["zloto"]
+    dodaj_exp(postac, przeciwnik["exp"])
+    pauza()
+
+
+def sklep(postac):
+    linia()
+    print("Witaj w sklepie!")
+    print("Złoto:", postac["zloto"])
+    print("1. Mikstura życia (+10 HP) — 5 złota")
+    print("2. Mikstura many (+5 many) — 5 złota")
+    print("3. Wyjdź")
+
+    wybor = wybor_opcji(3)
+
+    if wybor == 1:
+        if postac["zloto"] >= 5:
+            postac["zloto"] -= 5
+            postac["hp"] = min(postac["max_hp"], postac["hp"] + 10)
+            print("Kupiono miksturę życia.")
+        else:
+            print("Za mało złota.")
+
+    elif wybor == 2:
+        if postac["zloto"] >= 5 and postac["klasa"] == "Mag":
+            postac["zloto"] -= 5
+            postac["mana"] = min(postac["max_mana"], postac["mana"] + 5)
+            print("Kupiono miksturę many.")
+        else:
+            print("Nie możesz kupić.")
+
+    elif wybor == 3:
+        return
+
+    pauza()
+
+
+
+def miasto(postac):
     while True:
-       
-        print("\n=== DODATKOWE OPCJE ===")
-      
-        print("[1] Odkrywaj świat")
-       
-        print("[2] Lore świata")
-        
-        print("[3] Powrót")
-     
-        c = input("> ")
-       
-        if c == "1":
-           
-            exploration_event(player)
-        elif c == "2":
-           
-            show_lore()
-        elif c == "3":
-         
+        linia()
+        print("== MIASTO ==")
+        print("1. Sklep")
+        print("2. Odpocznij (pełne HP i mana)")
+        print("3. Statystyki")
+        print("4. Wyjście z miasta")
+
+        wybor = wybor_opcji(4)
+
+        if wybor == 1:
+            sklep(postac)
+        elif wybor == 2:
+            postac["hp"] = postac["max_hp"]
+            postac["mana"] = postac["max_mana"]
+            print("Wypocząłeś!")
+            pauza()
+        elif wybor == 3:
+            pokaz_statystyki(postac)
+        else:
             return
-        else:
-          
-            print("Zły wybór.")
 
-def game():
-    print("Witaj w rozszerzonej wersji RPG!")
-    name = input("Podaj imię bohatera: ")
-   
-    player = Player(name)
-    
+
+def gra():
+    postac = stworz_postac()
+
     while True:
- 
-        print("\n=== MENU GŁÓWNE ===")
-     
-        print("[1] Walcz")
-   
-        print("[2] Sklep")
-      
-        print("[3] Statystyki")
-     
-        print("[4] Dodatkowe opcje")
-     
-        print("[5] Wyjście")
-       
-        choice = input("> ")
-       
-        if choice == "1":
-            
-            enemy = create_random_enemy(player.level)
-       
-            fight(player, enemy)
-          
-            if not player.is_alive():
-              
-                print("Koniec gry!")
-           
-                break
-        elif choice == "2":
-           
-            shop(player)
-        elif choice == "3":
-          
-            print(f"\n{player.name} — Poziom {player.level}")
-          
-            print(f"HP: {player.hp}/{player.max_hp}")
-           
-            print(f"Atak: {player.attack_min}-{player.attack_max}")
-          
-            print(f"XP: {player.xp}")
-           
-            print(f"Złoto: {player.gold}")
-     
-            print(f"Mikstury: {player.healing_potions}")
-        elif choice == "4":
-          
-            extended_menu(player)
-        elif choice == "5":
-       
-            print("Do zobaczenia!")
+        linia()
+        print("== MENU GŁÓWNE ==")
+        print("1. Wyrusz na przygodę")
+        print("2. Idź do miasta")
+        print("3. Statystyki")
+        print("4. Zakończ grę")
 
-            break
+        wybor = wybor_opcji(4)
+
+        if wybor == 1:
+            przeciwnik = losowy_przeciwnik()
+            walka(postac, przeciwnik)
+        elif wybor == 2:
+            miasto(postac)
+        elif wybor == 3:
+            pokaz_statystyki(postac)
         else:
+            print("Dzięki za grę!")
+            break
 
-            print("Zły wybór.")
 
-def padding():
-  
-    pass
 
-game()  
+gra()
+
